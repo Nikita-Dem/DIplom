@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Просмотр документа{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('documents_list') }}">Документы</a></li>
+                    <li class="breadcrumb-item active">Просмотр документа</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas {% if document.document_type_code == 'protocol' %}fa-file-word{% else %}fa-file-pdf{% endif %} me-2"></i>
+                        {{ document.title }}
+                    </h4>
+                    <span class="badge bg-light text-dark">
+                        {% if document.document_type_code == 'protocol' %}
+                            <i class="fas fa-file-word text-primary me-1"></i>Протокол (Word)
+                        {% else %}
+                            <i class="fas fa-file-pdf text-danger me-1"></i>Постановление (PDF)
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3 text-muted">ID документа:</div>
+                        <div class="col-md-9 fw-bold">#{{ document.id }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 text-muted">Номер документа:</div>
+                        <div class="col-md-9">{{ document.document_number }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 text-muted">Дата документа:</div>
+                        <div class="col-md-9">{{ document.document_date_full }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 text-muted">Дата создания:</div>
+                        <div class="col-md-9">{{ document.created_at }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 text-muted">Автор:</div>
+                        <div class="col-md-9">{{ document.author }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 text-muted">Статус:</div>
+                        <div class="col-md-9">
+                            <span class="badge bg-success">{{ document.status }}</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 text-muted">Файл:</div>
+                        <div class="col-md-9">
+                            {% if document.document_type_code == 'protocol' %}
+                                <i class="fas fa-file-word text-primary me-1"></i>
+                            {% else %}
+                                <i class="fas fa-file-pdf text-danger me-1"></i>
+                            {% endif %}
+                            {{ document.file_name }}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('documents_list') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Назад
+                        </a>
+                        <a href="{{ url_for('download_document', doc_id=document.id) }}" class="btn btn-success">
+                            <i class="fas fa-download me-2"></i>Скачать
+                        </a>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="fas fa-trash me-2"></i>Удалить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Подтверждение удаления
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Вы уверены, что хотите удалить документ:</p>
+                <p class="fw-bold text-center p-3 bg-light rounded">
+                    {{ document.title }}
+                </p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Внимание!</strong> Это действие нельзя отменить. Файл документа будет безвозвратно удален.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Отмена
+                </button>
+                <form action="{{ url_for('delete_document', doc_id=document.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Удалить навсегда
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
