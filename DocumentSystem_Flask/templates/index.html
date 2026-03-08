@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - Система документооборота{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-file-alt"></i>
+            Система автоматического формирования документов
+        </h1>
+        <p class="lead">Автоматизация создания протоколов и постановлений с сохранением в базе данных</p>
+    </div>
+</div>
+
+<!-- Статистика -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Всего документов</h6>
+                        <h2 class="mb-0">{{ total_count }}</h2>
+                    </div>
+                    <i class="fas fa-file-alt fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Протоколы</h6>
+                        <h2 class="mb-0">{{ protocols_count }}</h2>
+                    </div>
+                    <i class="fas fa-file-pdf fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Постановления</h6>
+                        <h2 class="mb-0">{{ resolutions_count }}</h2>
+                    </div>
+                    <i class="fas fa-file-word fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Быстрые действия -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Быстрые действия</h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('create_protocol') }}" class="btn btn-primary">
+                    <i class="fas fa-file-pdf"></i> Создать протокол
+                </a>
+                <a href="{{ url_for('create_resolution') }}" class="btn btn-success">
+                    <i class="fas fa-file-word"></i> Создать постановление
+                </a>
+                <a href="{{ url_for('documents_list') }}" class="btn btn-info">
+                    <i class="fas fa-list"></i> Все документы
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Последние документы -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Последние документы</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_documents %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Тип</th>
+                                    <th>Название</th>
+                                    <th>Дата создания</th>
+                                    <th>Статус</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doc in recent_documents %}
+                                <tr>
+                                    <td>{{ doc.id }}</td>
+                                    <td>
+                                        {% if doc.document_type_code == 'protocol' %}
+                                            <span class="badge bg-danger">Протокол</span>
+                                        {% else %}
+                                            <span class="badge bg-primary">Постановление</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ doc.title }}</td>
+                                    <td>{{ doc.created_at }}</td>
+                                    <td>
+                                        <span class="badge bg-success">{{ doc.status }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('view_document', doc_id=doc.id) }}"
+                                           class="btn btn-sm btn-info" title="Просмотр">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('download_document', doc_id=doc.id) }}"
+                                           class="btn btn-sm btn-success" title="Скачать">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center my-3">Нет созданных документов</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
